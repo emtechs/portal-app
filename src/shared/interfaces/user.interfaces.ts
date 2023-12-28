@@ -3,23 +3,17 @@ import {
   createAdmSchema,
   createDirectorSchema,
   createSecretSchema,
+  iDialogDataProps,
+  iWorkSchool,
   userFirstSchema,
   userPasswordSchema,
   userUpdateSchema,
-} from '../schemas'
-import { iWorkSchool } from './school.interface'
-import { iDialogDataProps } from './global.interfaces'
-
-export type iRole = 'ADMIN' | 'SERV' | 'DIRET' | 'SECRET'
-
-export type iDash = 'COMMON' | 'SCHOOL' | 'ORGAN' | 'ADMIN'
+} from '../../shared'
 
 export interface iUserProfile {
   id: string
   name: string
-  role: iRole
-  dash: iDash
-  is_super: boolean
+  email?: string
   is_first_access: boolean
   profile?: {
     url: string
@@ -56,10 +50,7 @@ export interface iDiretor {
   cpf: string
 }
 
-export interface iServer extends iDiretor {
-  role: iRole
-  dash: iDash
-}
+export type iServer = iDiretor
 
 export type iUserAdmRequest = z.infer<typeof createAdmSchema>
 

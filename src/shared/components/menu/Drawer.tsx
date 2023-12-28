@@ -1,93 +1,113 @@
+import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Badge, Box, Divider, Drawer, List } from '@mui/material'
 import {
-  Box,
-  Divider,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material'
-import { Dashboard, FirstPage, Logout } from '@mui/icons-material'
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+  Edit,
+  Home,
+  LibraryAddCheck,
+  Logout,
+  Password,
+} from '@mui/icons-material'
 import {
+  ButtonListItem,
+  DialogBase,
+  ListItemDrawerLink,
+  ListItemLink,
   useAppThemeContext,
-  useDrawerContext,
   useAuthContext,
+  useDrawerContext,
 } from '../../../shared'
-import { Options } from './options'
 
 export const MenuDrawer = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
   const { theme, smDown } = useAppThemeContext()
-  const { isDrawerOpen, toggleDrawerOpen, handleClick, displayDash } =
-    useDrawerContext()
-  const { logout, dashData } = useAuthContext()
+  const { isDrawerOpen, toggleDrawerOpen } = useDrawerContext()
+  const { userProfile, logout } = useAuthContext()
+  const [open, setOpen] = useState(true)
 
-  const listButton = useMemo(() => {
-    if (dashData === 'ADMIN') {
-      if (displayDash === 'ADMIN')
-        return (
-          <ListItemButton component={Link} to="/dash" onClick={handleClick}>
-            <ListItemIcon>
-              <Dashboard />
-            </ListItemIcon>
-            <ListItemText primary="Painel Escola" />
-          </ListItemButton>
-        )
+  const onClose = () => setOpen((old) => !old)
 
-      return (
-        <ListItemButton component={Link} to="/dash" onClick={handleClick}>
-          <ListItemIcon>
-            <FirstPage />
-          </ListItemIcon>
-          <ListItemText primary="Voltar" />
-        </ListItemButton>
-      )
-    }
-
-    return (
-      <ListItemButton component={Link} to="/" onClick={handleClick}>
-        <ListItemIcon>
-          <FirstPage />
-        </ListItemIcon>
-        <ListItemText primary="Voltar" />
-      </ListItemButton>
-    )
-  }, [dashData, displayDash, handleClick])
+  const action = () => navigate('/request')
 
   return (
-    <Drawer
-      open={isDrawerOpen}
-      variant={smDown ? 'temporary' : 'permanent'}
-      onClose={toggleDrawerOpen}
-    >
-      <Box
-        display="flex"
-        flexDirection="column"
-        width={theme.spacing(28)}
-        height="100%"
+    <>
+      <Drawer
+        open={isDrawerOpen}
+        variant={smDown ? 'temporary' : 'permanent'}
+        onClose={toggleDrawerOpen}
       >
-        <Box width="100%" bgcolor={theme.palette.primary.main} p={1}>
-          <img src="/logo.webp" alt="EM Soluções Tecnológicas" />
+        <Box
+          display="flex"
+          flexDirection="column"
+          width={theme.spacing(28)}
+          height="100%"
+        >
+          <Box
+            width="100%"
+            height={theme.spacing(12)}
+            bgcolor={theme.palette.background.default}
+            p={1}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <img src="/logo.webp" alt="EM Soluções Tecnológicas" />
+          </Box>
+          <Divider />
+          <Box flex={1}>
+            <List component="nav">
+              {userProfile && userProfile.requests > 0 && (
+                <ListItemDrawerLink
+                  icon={
+                    <Badge badgeContent={userProfile.requests} color="primary">
+                      <LibraryAddCheck />
+                    </Badge>
+                  }
+                  label="Solicitações"
+                  to="request"
+                />
+              )}
+              {[
+                { icon: <Home />, label: 'Página Inicial', to: '/' },
+                { icon: <Edit />, label: 'Editar Perfil', to: '/profile/edit' },
+                {
+                  icon: <Password />,
+                  label: 'Editar Senha',
+                  to: '/profile/edit/password',
+                },
+              ].map((el) => (
+                <ListItemLink
+                  key={el.label}
+                  icon={el.icon}
+                  to={el.to}
+                  selected={location.pathname === el.to}
+                  label={el.label}
+                />
+              ))}
+            </List>
+          </Box>
+          <Box>
+            <List component="nav">
+              <ButtonListItem icon={<Logout />} label="Sair" onClick={logout} />
+            </List>
+          </Box>
         </Box>
-        <Divider />
-        <Box flex={1}>
-          <List component="nav">
-            <Options />
-          </List>
-        </Box>
-        <Box>
-          <List component="nav">
-            {listButton}
-            <ListItemButton onClick={logout}>
-              <ListItemIcon>
-                <Logout />
-              </ListItemIcon>
-              <ListItemText primary="Sair" />
-            </ListItemButton>
-          </List>
-        </Box>
-      </Box>
-    </Drawer>
+      </Drawer>
+      {userProfile &&
+        userProfile.requests > 0 &&
+        !location.pathname.includes('request') && (
+          <DialogBase
+            open={open}
+            onClose={onClose}
+            title={'Solicitações'}
+            description={
+              'Você possui solicitações pendentes aguardando análise.'
+            }
+            action={action}
+            actionTitle="Verificar"
+          />
+        )}
+    </>
   )
 }

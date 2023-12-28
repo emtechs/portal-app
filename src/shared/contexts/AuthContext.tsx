@@ -13,7 +13,6 @@ import {
   iLoginRequest,
   iRecoveryPasswordRequest,
   iUserProfile,
-  iDash,
   iYear,
   iChildren,
   useAppThemeContext,
@@ -38,7 +37,6 @@ interface iAuthContextData {
   isAuthenticated: boolean
   userProfile: iUserProfile | undefined
   handleUserProfile: (newUser: iUserProfile) => void
-  dashData: iDash | undefined
   yearData: iYear | undefined
   profileUser: () => void
   refreshUser: () => void
@@ -51,7 +49,6 @@ export const AuthProvider = ({ children }: iChildren) => {
   const { setLoading, handleSucess, handleError } = useAppThemeContext()
   const [accessToken, setAccessToken] = useState<string>()
   const [userProfile, setUserProfile] = useState<iUserProfile>()
-  const [dashData, setDashData] = useState<iDash>()
   const [yearData, setYearData] = useState<iYear>()
 
   const handleUserProfile = (newUser: iUserProfile) => setUserProfile(newUser)
@@ -71,12 +68,6 @@ export const AuthProvider = ({ children }: iChildren) => {
     apiUser
       .profile()
       .then((res) => setUserProfile(res))
-      .catch(() => {
-        localStorage.removeItem('@EMTechs:token')
-        localStorage.removeItem('@EMTechs:refresh_token')
-        setAccessToken(undefined)
-        navigate('/login')
-      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -86,7 +77,6 @@ export const AuthProvider = ({ children }: iChildren) => {
       .profile()
       .then((res) => {
         setUserProfile(res)
-        setDashData(res.dash)
       })
       .finally(() => setLoading(false))
 
@@ -166,7 +156,7 @@ export const AuthProvider = ({ children }: iChildren) => {
     localStorage.removeItem('@EMTechs:refresh_token')
     setAccessToken(undefined)
     setUserProfile(undefined)
-    setDashData(undefined)
+
     navigate('/login')
   }, [])
 
@@ -180,7 +170,6 @@ export const AuthProvider = ({ children }: iChildren) => {
         logout: handleLogout,
         recovery: handleRecovey,
         recoveryPassword: handleRecoveyPassword,
-        dashData,
         yearData,
         profileUser,
         handleUserProfile,

@@ -38,6 +38,8 @@ apiUsingNow.interceptors.response.use(
         localStorage.setItem('@EMTechs:refresh_token', refresh_token)
         return apiUsingNow(originalRequest)
       } catch (error: any) {
+        localStorage.removeItem('@EMTechs:token')
+        location.href = ''
         if (error.response && error.response.data) {
           return Promise.reject(error.response.data)
         }
