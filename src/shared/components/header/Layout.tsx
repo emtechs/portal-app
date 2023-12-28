@@ -8,7 +8,11 @@ import {
   useAuthContext,
 } from '../../../shared'
 
-export const HeaderLayout = () => {
+interface iHeaderLayoutProps {
+  isMenu?: boolean
+}
+
+export const HeaderLayout = ({ isMenu }: iHeaderLayoutProps) => {
   const { theme, smDown } = useAppThemeContext()
   const { userProfile } = useAuthContext()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -41,34 +45,42 @@ export const HeaderLayout = () => {
   }
 
   return (
-    <Box pt={1} pl={1} pr={2} display="flex" justifyContent="space-between">
-      <Box display="flex">
-        <MenuLayout
-          anchorEl={anchorEl}
-          onClick={handleClickPerfil}
-          onClose={handleClosePerfil}
-          open={openPerfil}
-          title="Perfil"
-          icon={<AccountCircle fontSize="small" />}
-          options={[
-            { to: '/profile/edit', value: 'Editar Perfil' },
-            { to: '/profile/edit/password', value: 'Editar Senha' },
-          ]}
-        />
-        <MenuLayout
-          anchorEl={anchorEl}
-          onClick={handleClickConfig}
-          onClose={handleCloseConfig}
-          open={openConfig}
-          title="Configurações"
-          icon={<Settings fontSize="small" />}
-          options={[
-            { to: '/user', value: 'Usuários' },
-            { to: '/user', value: 'Permissões' },
-            { to: '/user', value: 'Categorias' },
-          ]}
-        />
-      </Box>
+    <Box
+      pt={1}
+      pl={1}
+      pr={2}
+      display="flex"
+      justifyContent={isMenu ? 'space-between' : 'flex-end'}
+    >
+      {isMenu && (
+        <Box display="flex">
+          <MenuLayout
+            anchorEl={anchorEl}
+            onClick={handleClickPerfil}
+            onClose={handleClosePerfil}
+            open={openPerfil}
+            title="Perfil"
+            icon={<AccountCircle fontSize="small" />}
+            options={[
+              { to: '/profile/edit', value: 'Editar Perfil' },
+              { to: '/profile/edit/password', value: 'Editar Senha' },
+            ]}
+          />
+          <MenuLayout
+            anchorEl={anchorEl}
+            onClick={handleClickConfig}
+            onClose={handleCloseConfig}
+            open={openConfig}
+            title="Configurações"
+            icon={<Settings fontSize="small" />}
+            options={[
+              { to: '/user', value: 'Usuários' },
+              { to: '/user', value: 'Permissões' },
+              { to: '/user', value: 'Categorias' },
+            ]}
+          />
+        </Box>
+      )}
       <Box display="flex" alignItems="center" gap={1}>
         <Typography>{user.name}</Typography>
         <Avatar
